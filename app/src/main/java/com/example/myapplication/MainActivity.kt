@@ -17,16 +17,16 @@ import android.widget.ImageView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var imageViews: List<ImageView>
-    private val fadeDuration = 1500L // Длительность анимации
-    private val delayBetweenImages = 0L // Задержка между изображениями
+    private val fadeDuration = 1500L // длительность анимации
+    private val delayBetweenImages = 0L // задержка между изображениями
 
     private lateinit var imageViewsTwo: List<ImageView>
-    private val fadeDurationTwo = 1000L // Длительность появления
-    private val rotateDuration = 1000L // Длительность вращения
-    private val delayBetweenImagesTwo = 500L // Задержка между изображениями
+    private val fadeDurationTwo = 1000L // длительность появления
+    private val rotateDuration = 1000L // длительность вращения
+    private val delayBetweenImagesTwo = 500L // дадержка между изображениями
 
     private lateinit var imageView: ImageView
-    private val animationDuration = 3000L // Длительность анимации
+    private val animationDuration = 3000L // длительность анимации
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         imageView = findViewById(R.id.imageView)
 
-        // Устанавливаем обработчик нажатия на кнопку
+
         val startAnimationButton = findViewById<Button>(R.id.button)
         startAnimationButton.setOnClickListener {
             startAnimationSequence()
@@ -68,21 +68,19 @@ class MainActivity : AppCompatActivity() {
 
     // Анимации для лапок
     private fun startAnimationSequence() {
-        val Button = findViewById<Button>(R.id.button)
-        Button.isEnabled = false
+
         for (i in imageViews.indices) {
             Handler(Looper.getMainLooper()).postDelayed({
                 if (i > 0) {
-                    fadeOutImage(imageViews[i - 1]) // Исчезаем предыдущее изображение
+                    fadeOutImage(imageViews[i - 1]) // убирает предыдущее изображение
                 }
-                fadeInImage(imageViews[i]) // Появляем текущее изображение
+                fadeInImage(imageViews[i]) // показывает текущее изображение
 
-                // Если это последнее изображение, добавим логику для его исчезновения
+                // если это последнее изображение
                 if (i == imageViews.lastIndex) {
                     Handler(Looper.getMainLooper()).postDelayed({
-                        fadeOutImage(imageViews[i]) // Исчезаем последнее изображение
-                    }, fadeDuration + delayBetweenImages) // Задержка до исчезновения
-                    Button.isEnabled = true
+                        fadeOutImage(imageViews[i]) // убирает последнее изображение
+                    }, fadeDuration + delayBetweenImages) // задержка до исчезновения
                 }
             }, i * (fadeDuration + delayBetweenImages) * 1)
         }
@@ -117,13 +115,19 @@ class MainActivity : AppCompatActivity() {
 
     // анимации цветков
     private fun startAnimationSequenceTwo() {
+
         for (i in imageViewsTwo.indices) {
             val imageView = imageViewsTwo[i]
             Handler(Looper.getMainLooper()).postDelayed({
                 fadeInImageTwo(imageView)
-                rotateImage(imageView, i % 2 == 0) // Вращение влево для четных, вправо для нечетных
+                rotateImage(imageView, i % 2 == 0) // влево для четных, вправо для нечетных
             }, i * (fadeDurationTwo + delayBetweenImagesTwo))
         }
+
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            fadeOutAllImages()
+        }, imageViewsTwo.size * (fadeDurationTwo + delayBetweenImagesTwo) + 100)
     }
 
     private fun fadeInImageTwo(imageView: ImageView) {
@@ -135,39 +139,50 @@ class MainActivity : AppCompatActivity() {
             .start()
     }
 
+    private fun fadeOutAllImages() {
+        for (imageView in imageViewsTwo) {
+            imageView.animate()
+                .alpha(0f)
+                .setDuration(fadeDurationTwo)
+                .withEndAction {
+                    imageView.visibility = View.GONE
+                }
+                .start()
+        }
+    }
+
     private fun rotateImage(imageView: ImageView, rotateLeft: Boolean) {
-        val rotationAngle = if (rotateLeft) -360f else 360f
-        // Создаем бесконечную анимацию вращения
+        val rotationAngle = if (rotateLeft) -360f else 360f // бесконечная анимация вращения
         val rotateAnimator = ObjectAnimator.ofFloat(imageView, "rotation", 0f, rotationAngle).apply {
             duration = rotateDuration
-            repeatCount = ObjectAnimator.INFINITE // Бесконечное повторение
-            repeatMode = ObjectAnimator.RESTART // Начинать заново после завершения
+            repeatCount = ObjectAnimator.INFINITE // бесконечное повторение
+            repeatMode = ObjectAnimator.RESTART
         }
-        // Запускаем анимацию
+        // запуск анимации
         rotateAnimator.start()
     }
+
     // конец анимации цветков
 
 
     private fun startInfiniteUpwardAnimation() {
-        // Устанавливаем начальное положение изображения (внизу экрана)
+        // начальное положение изображения
         val Button = findViewById<Button>(R.id.button3)
         Button.visibility = View.INVISIBLE
         imageView.visibility = View.VISIBLE
         imageView.translationY = heightOfScreen().toFloat()
-        // Создаем анимацию движения вверх
+        //  анимация движения вверх
         val upwardAnimator = ObjectAnimator.ofFloat(imageView, "translationY", heightOfScreen().toFloat(), -imageView.height.toFloat()).apply {
             duration = animationDuration
-            //repeatCount = ObjectAnimator.INFINITE // Бесконечное повторение
-            repeatMode = ObjectAnimator.RESTART // Начинать заново после завершения
+            repeatMode = ObjectAnimator.RESTART
         }
 
-        // Запускаем анимацию
+        // запуск анимации
         upwardAnimator.start()
         Button.visibility = View.VISIBLE
     }
 
     private fun heightOfScreen(): Int {
-        return resources.displayMetrics.heightPixels // Возвращаем высоту экрана в пикселях
+        return resources.displayMetrics.heightPixels //  высота экрана
     }
 }
